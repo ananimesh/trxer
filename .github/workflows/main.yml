@@ -1,0 +1,39 @@
+name: Tag and Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to create (e.g., v1.2.3)'
+        required: true
+      target_ref:
+        description: 'Branch or commit SHA to tag (e.g., master or abc1234)'
+        required: false
+        default: 'master'
+
+jobs:
+  tag_and_release:
+    name: Tag and Release
+    runs-on: ubuntu-latest
+
+    # ⛔ Restrict who can trigger this using environment reviewers
+    environment: release
+
+    permissions:
+      contents: write  # Needed to create tags and releases
+
+    steps:
+      - name: Checkout target ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.target_ref }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create and push tag
+        run: |
+          git tag ${{ github.event.inputs.tag }}
+          gi
